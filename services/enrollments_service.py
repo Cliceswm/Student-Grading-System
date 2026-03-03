@@ -51,7 +51,7 @@ def enroll_student(course_id, student_id_raw):
         return None, "Student is already enrolled"
 
     enroll_student_repo(course_id, student_id)
-    return f"Student {student_id:05d} - {student["last_name"]} {student["first_name"]} enrolled", None
+    return f"Student {student_id:05d} - {student['last_name']} {student['first_name']} enrolled", None
 
 
 
