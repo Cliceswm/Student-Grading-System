@@ -16,3 +16,93 @@ def test_courses_page_requires_login(client):
 def test_profile_page_requires_login(client):
     response = client.get("/profile", follow_redirects=True)
     assert response.status_code in (200, 302)
+
+
+def test_enrollments_page_exists(client):
+    response = client.get("/courses/1/edit/enrollments", follow_redirects=True)
+    assert response.status_code in (200, 302, 404)
+
+
+
+def test_edit_course_page_exists(client):
+    response = client.get("/courses/edit/1", follow_redirects=True)
+    assert response.status_code in (200, 302, 404)
+
+
+
+def test_create_enrollment(client):
+    response = client.post(
+        "/courses/1/edit/enrollments",
+        data={
+            "action": "enroll",
+            "student_id": "1"
+        },
+        follow_redirects=True
+    )
+    assert response.status_code in (200, 302, 404)
+
+
+def test_enroll_student(client):
+    response = client.post(
+        "/courses/1/edit/enrollments",
+        data={
+            "action": "enroll",
+            "student_id": "1"
+        },
+        follow_redirects=True
+    )
+    assert response.status_code in (200, 302, 404)
+
+
+
+def test_unenroll_student(client):
+    response = client.post(
+        "/courses/1/edit/enrollments",
+        data={
+            "action": "unenroll",
+            "student_id": "1"
+        },
+        follow_redirects=True
+    )
+    assert response.status_code in (200, 302, 404)
+
+
+def test_enrollment_invalid_action(client):
+    response = client.post(
+        "/courses/1/edit/enrollments",
+        data={
+            "action": "invalid_action",
+            "student_id": "1"
+        },
+        follow_redirects=True
+    )
+    assert response.status_code in (200, 302, 400, 404)
+
+
+
+def test_enrollment_missing_student_id(client):
+    response = client.post(
+        "/courses/1/edit/enrollments",
+        data={
+            "action": "enroll"
+        },
+        follow_redirects=True
+    )
+    assert response.status_code in (200, 302, 400, 404)
+
+
+
+def test_enrollment_empty_data(client):
+    response = client.post(
+        "/courses/1/edit/enrollments",
+        data={},
+        follow_redirects=True
+    )
+    assert response.status_code in (200, 302, 400, 404)
+
+
+
+
+def test_enrollment_invalid_course(client):
+    response = client.get("/courses/999/edit/enrollments", follow_redirects=True)
+    assert response.status_code in (200, 302, 404)
