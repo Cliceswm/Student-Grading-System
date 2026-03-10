@@ -23,7 +23,7 @@
     <tr class="clickable-row" data-href="{% if current_user.role == 'admin' %}
                    {{ url_for('courses.edit_course', course_id=c.id) }}
                {% else %}
-                   {{ url_for('courses.assessments', course_id=c.id) }}
+                   {{ url_for('assessments.assessments', course_id=c.id) }}
                {% endif %}" onclick="window.location=this.dataset.href">
 
 
