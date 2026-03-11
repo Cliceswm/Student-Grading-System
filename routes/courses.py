@@ -87,10 +87,3 @@ def edit_course(course_id):
         error=error,
         success=success
     )
-
-
-# Assessments page
-@courses_bp.route("/courses/<int:course_id>/assessments")
-@login_required
-def assessments(course_id):
-    return "Assessments page is not ready", 200

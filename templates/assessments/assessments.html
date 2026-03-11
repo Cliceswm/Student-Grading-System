@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>Assessments for {{ course.name }}</h1>
+
+{% if current_user.role == "teacher" %}
+<a href="/courses/{{ course.id }}/assessments/add_assessment">Add assessment</a>
+<br><br>
+{% endif %}
+
+<table style="width: 100%; border-collapse: collapse;" border="1" cellpadding="8">
+    <tr>
+        <th>Title</th>
+        <th>Due date</th>
+        <th>Weight</th>
+
+        {% if current_user.role == "teacher" %}
+        <th>Submissions</th>
+        {% else %}
+        <th>Your grade</th>
+        {% endif %}
+    </tr>
+
+    {% for a in assessments %}
+    <tr class="clickable-row"
+        data-href="
+            {% if current_user.role == 'teacher' %}
+                /courses/{{ course.id }}/assessments/{{ a.id }}/submissions
+            {% else %}
+                /courses/{{ course.id }}/assessments/{{ a.id }}/submission
+            {% endif %}
+        "
+        onclick="window.location=this.dataset.href">
+
+        <td>{{ a.title }}</td>
+        <td>{{ a.due_date }}</td>
+        <td>{{ a.weight }}%</td>
+
+        {% if current_user.role == "teacher" %}
+        <td>{{ a.submissions_count }}</td>
+        {% else %}
+        <td>{{ a.final_grade }}</td>
+        {% endif %}
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}

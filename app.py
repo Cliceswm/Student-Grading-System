@@ -4,6 +4,7 @@ from routes.profile import profile_bp
 from routes.courses import courses_bp
 from routes.users import users_bp
 from routes.enrollments import enrollments_bp
+from routes.assessments import assessments_bp
 from db import close_db
 
 def create_app():
@@ -16,6 +17,7 @@ def create_app():
     app.register_blueprint(courses_bp)
     app.register_blueprint(users_bp)
     app.register_blueprint(enrollments_bp)
+    app.register_blueprint(assessments_bp)
 
     # Register DB teardown
     app.teardown_appcontext(close_db)
