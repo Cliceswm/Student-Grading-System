@@ -7,8 +7,9 @@ from repositories.courses_repository import (
     update_course
 )
 from repositories.users_repository import get_user_by_id, get_all_teachers
+from repositories.assessments_repository import get_assessments_for_course
+from repositories.submissions_repository import get_submission
 from services.enrollments_service import count_active_students_for_course
-
 
 
 def get_courses_for_user(role: str, user_id: int):
@@ -24,7 +25,7 @@ def get_courses_for_user(role: str, user_id: int):
     enriched = []
 
     for c in courses:
-        course = dict(c)  # Transform Row into dict
+        course = dict(c)
 
         if role in ("admin", "teacher"):
             count, _ = count_active_students_for_course(course["id"])
@@ -33,7 +34,8 @@ def get_courses_for_user(role: str, user_id: int):
 
         else:  # student
             course["active_students"] = None
-            course["final_grade"] = None  # STUB
+            final = compute_final_grade_for_student(course["id"], user_id)
+            course["final_grade"] = final
 
         enriched.append(course)
 
@@ -110,3 +112,33 @@ def process_course_edit(course_id: int, form):
 
     updated = get_course_by_id(course_id)
     return updated, True
+
+
+def compute_final_grade_for_student(course_id, student_id):
+    assessments = get_assessments_for_course(course_id)
+
+    total = None
+
+    for a in assessments:
+        submission = get_submission(a["id"], student_id)
+
+        # Ignore if not submitted
+        if not submission:
+            continue
+
+        # Ignore if submitted but not graded
+        if submission["grade"] is None:
+            continue
+
+        # Ignore if assessment weight <= 0
+        if a["weight"] <= 0:
+            continue
+
+        # Add weighted grade
+        if total is None:
+            total = submission["grade"] * (a["weight"] / 100)
+        else:
+            total += submission["grade"] * (a["weight"] / 100)
+
+    # If nothing graded yet → return None
+    return round(total, 2) if total is not None else None

@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>Edit {{ assessment.title }}</h1>
+
+{% if error %}
+<p class="msg-error">{{ error }}</p>
+{% endif %}
+{% if success %}
+<p class="msg-success">{{ success }}</p>
+{% endif %}
+
+<p><b>Subject:</b> {{ course.name }}</p>
+
+<form method="POST">
+    <label>Title:</label><br>
+    <input type="text" name="title" value="{{ assessment.title }}"><br><br>
+
+    <label>Description:</label><br>
+    <textarea name="description" rows="4">{{ assessment.description }}</textarea><br><br>
+
+    <label>Weight (%):</label><br>
+    <input type="number" step="0.1" name="weight" value="{{ assessment.weight }}"><br><br>
+
+    <label>Due date:</label><br>
+    <input type="date" name="due_date" value="{{ assessment.due_date }}"><br><br>
+
+    <button type="submit">Save changes</button>
+</form>
+
+<br>
+<a href="/courses/{{ course.id }}/assessments/{{ assessment.id }}/submissions">← Back to submissions</a>
+
+{% endblock %}

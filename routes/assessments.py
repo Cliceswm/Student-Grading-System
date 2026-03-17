@@ -2,7 +2,12 @@ from flask import Blueprint, render_template, request, session
 from db import get_db
 from routes.auth import login_required
 from services.courses_service import get_course_by_id
-from services.assessments_service import add_assessment_service, get_assessments_service
+from services.assessments_service import (
+    add_assessment_service, 
+    get_assessments_service,
+    get_assessment_by_id,
+    edit_assessment_service
+)
 
 assessments_bp = Blueprint("assessments", __name__)
 
@@ -56,14 +61,40 @@ def add_assessment(course_id):
     )
 
 
-
-# Stubs:
-@assessments_bp.route("/courses/<int:course_id>/assessments/<int:assessment_id>/submissions")
+# Edit assessment page
+@assessments_bp.route("/courses/<int:course_id>/assessments/<int:assessment_id>/edit", methods=["GET", "POST"])
 @login_required
-def assessment_submissions(course_id, assessment_id):
-    return f"Teacher view for submissions of assessment {assessment_id} in course {course_id} (stub)"
+def edit_assessment(course_id, assessment_id):
+    if session["role"] != "teacher":
+        return "Access denied", 403
 
-@assessments_bp.route("/courses/<int:course_id>/assessments/<int:assessment_id>/submission")
-@login_required
-def student_submission(course_id, assessment_id):
-    return f"Student view for your submission for assessment {assessment_id} in course {course_id} (stub)"
+    assessment = get_assessment_by_id(assessment_id)
+    if not assessment or assessment["course_id"] != course_id:
+        return "Assessment not found", 404
+
+    course = get_course_by_id(course_id)
+
+    if request.method == "POST":
+        try:
+            updated, success = edit_assessment_service(course_id, assessment_id, request.form)
+            assessment = updated
+        except ValueError as e:
+            return render_template(
+                "assessments/edit_assessment.html",
+                course=course,
+                assessment=assessment,
+                error=str(e)
+            )
+
+        return render_template(
+            "assessments/edit_assessment.html",
+            course=course,
+            assessment=assessment,
+            success="Assessment updated successfully"
+        )
+
+    return render_template(
+        "assessments/edit_assessment.html",
+        course=course,
+        assessment=assessment
+    )

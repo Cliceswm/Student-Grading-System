@@ -43,10 +43,7 @@
             {% endif %}
         </td>
         {% else %}
-        <td>{% if c.final_grade is not none %}
-            {{ c.final_grade }}
-            {% endif %}
-        </td>
+        <td>{{ c.final_grade if c.final_grade is not none else "-" }}</td>
         {% endif %}
     </tr>
     {% endfor %}
