@@ -6,12 +6,18 @@ from routes.users import users_bp
 from routes.enrollments import enrollments_bp
 from routes.assessments import assessments_bp
 from routes.submissions import submissions_bp
+from flask_wtf.csrf import CSRFProtect
+
+csrf = CSRFProtect()
 
 from db import close_db
 
 def create_app():
     app = Flask(__name__)
+    
     app.secret_key = "supersecretkey"
+
+    csrf.init_app(app)
 
     # Register blueprints
     app.register_blueprint(auth_bp)

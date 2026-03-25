@@ -1,23 +1,26 @@
+import bcrypt
 from repositories.users_repository import (
-    find_user_by_id_and_password,
-    find_user_by_email_and_password
+    find_user_by_id,
+    find_user_by_email
 )
 
 
 def authenticate_user(identifier: str, password: str):
-    """
-    Returns:
-    - (user, None) if success
-    - (None, "error text") if failure
-    """
 
-    # If the user entered a number → search by ID
+    # Determine search method
     if identifier.isdigit():
-        user = find_user_by_id_and_password(int(identifier), password)
+        user = find_user_by_id(int(identifier))
     else:
-        user = find_user_by_email_and_password(identifier, password)
+        user = find_user_by_email(identifier)
 
     if not user:
+        return None, "Invalid credentials"
+
+    # Check password using bcrypt
+    stored_hash = user["password"].encode("utf-8")
+    entered = password.encode("utf-8")
+
+    if not bcrypt.checkpw(entered, stored_hash):
         return None, "Invalid credentials"
 
     if user["active"] == 0:

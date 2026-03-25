@@ -1,9 +1,10 @@
 import sqlite3
+import bcrypt
 
 conn = sqlite3.connect("db.sqlite")
 cursor = conn.cursor()
 
-# Table of users
+# Users table
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -16,7 +17,7 @@ CREATE TABLE IF NOT EXISTS users (
 )
 """)
 
-# Table of courses
+# Courses table
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS courses (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -26,7 +27,7 @@ CREATE TABLE IF NOT EXISTS courses (
 )
 """)
 
-# Table of enrollments
+# Enrollments table
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS enrollments (
     student_id INTEGER NOT NULL,
@@ -37,40 +38,49 @@ CREATE TABLE IF NOT EXISTS enrollments (
 )
 """)
 
-# Table of assessments
+# Assessments table
 cursor.execute("""
-    CREATE TABLE IF NOT EXISTS assessments (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        course_id INTEGER NOT NULL,
-        title TEXT NOT NULL,
-        description TEXT,
-        weight REAL NOT NULL,
-        due_date TEXT,
-        FOREIGN KEY (course_id) REFERENCES courses(id)
-    )
-    """)
+CREATE TABLE IF NOT EXISTS assessments (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    course_id INTEGER NOT NULL,
+    title TEXT NOT NULL,
+    description TEXT,
+    weight REAL NOT NULL,
+    due_date TEXT,
+    FOREIGN KEY (course_id) REFERENCES courses(id)
+)
+""")
 
-# Table of submissions
+# Submissions table
 cursor.execute("""
-    CREATE TABLE IF NOT EXISTS submissions (
-        assessment_id INTEGER NOT NULL,
-        student_id INTEGER NOT NULL,
-        submitted TEXT NOT NULL,
-        student_comment TEXT,
-        grade REAL,
-        feedback TEXT,
-        PRIMARY KEY (assessment_id, student_id),
-        FOREIGN KEY (assessment_id) REFERENCES assessments(id),
-        FOREIGN KEY (student_id) REFERENCES users(id)
-    )
-    """)
+CREATE TABLE IF NOT EXISTS submissions (
+    assessment_id INTEGER NOT NULL,
+    student_id INTEGER NOT NULL,
+    submitted TEXT NOT NULL,
+    student_comment TEXT,
+    grade REAL,
+    feedback TEXT,
+    PRIMARY KEY (assessment_id, student_id),
+    FOREIGN KEY (assessment_id) REFERENCES assessments(id),
+    FOREIGN KEY (student_id) REFERENCES users(id)
+)
+""")
 
-cursor.execute("SELECT * FROM users WHERE role = 'admin'") 
-admin_exists = cursor.fetchone() 
-if not admin_exists: 
-    cursor.execute(""" INSERT INTO users (first_name, last_name, email, password, role) VALUES (?, ?, ?, ?, ?) """, ("Admin", "Adminych", "admin@example.com", "admin123", "admin")) 
-    print("Administrator created: admin@example.com / admin123") 
-else: 
+# Create admin if not exists
+cursor.execute("SELECT * FROM users WHERE role = 'admin'")
+admin_exists = cursor.fetchone()
+
+if not admin_exists:
+    raw_password = "admin123"
+    hashed = bcrypt.hashpw(raw_password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+
+    cursor.execute("""
+        INSERT INTO users (first_name, last_name, email, password, role)
+        VALUES (?, ?, ?, ?, ?)
+    """, ("Admin", "Adminych", "admin@example.com", hashed, "admin"))
+
+    print(f"Administrator created: admin@example.com / {raw_password} (hashed)")
+else:
     print("Administrator exists")
 
 conn.commit()

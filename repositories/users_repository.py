@@ -2,21 +2,21 @@ import sqlite3
 from db import get_db
 
 
-
-def find_user_by_id_and_password(user_id: int, password: str):
+def find_user_by_email(email: str):
     db = get_db()
     return db.execute(
-        "SELECT * FROM users WHERE id = ? AND password = ?",
-        (user_id, password)
+        "SELECT * FROM users WHERE LOWER(email) = LOWER(?)",
+        (email,)
     ).fetchone()
 
 
-def find_user_by_email_and_password(email: str, password: str):
+def find_user_by_id(user_id: int):
     db = get_db()
     return db.execute(
-        "SELECT * FROM users WHERE LOWER(email) = LOWER(?) AND password = ?",
-        (email, password)
+        "SELECT * FROM users WHERE id = ?",
+        (user_id,)
     ).fetchone()
+
 
 
 def fetch_all_users():
