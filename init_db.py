@@ -55,7 +55,8 @@ cursor.execute("""
     CREATE TABLE IF NOT EXISTS submissions (
         assessment_id INTEGER NOT NULL,
         student_id INTEGER NOT NULL,
-        submitted_at TEXT,
+        submitted TEXT NOT NULL,
+        student_comment TEXT,
         grade REAL,
         feedback TEXT,
         PRIMARY KEY (assessment_id, student_id),

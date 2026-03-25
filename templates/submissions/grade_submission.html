@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>Grade {{ assessment.title }} in {{ course.name }}</h1>
+
+<p><b>Due date:</b> {{ assessment.due_date or "Not set" }}</p>
+
+<p><b>Submitted:</b> {{ submission.submitted or "Not submitted" }}</p>
+
+{% if assessment.due_date %}
+    {% if submission.lateness_days is not none %}
+        {% if submission.lateness_days > 0 %}
+            <p style="color:red;"><b>Late by {{ submission.lateness_days }} days</b></p>
+        {% elif submission.lateness_days < 0 %}
+            <p style="color:green;"><b>Submitted {{ submission.lateness_days | abs }} days early</b></p>
+        {% else %}
+            <p><b>Submitted on time</b></p>
+        {% endif %}
+    {% endif %}
+{% endif %}
+
+<p><b>Student comment:</b> {{ submission.student_comment or "No comment" }}</p>
+
+<hr>
+
+<h2>Grade</h2>
+
+{% if success %}
+<p class="msg-success">{{ success }}</p>
+{% endif %}
+
+<form method="POST">
+    <label>Grade (0–100):</label><br>
+    <input type="number" step="0.1" name="grade" value="{{ submission.grade }}"><br><br>
+
+    <label>Feedback:</label><br>
+    <textarea name="feedback" rows="4">{{ submission.feedback }}</textarea><br><br>
+
+    <button type="submit">Save</button>
+</form>
+
+<br>
+<a href="/courses/{{ course.id }}/assessments/{{ assessment.id }}/submissions">← Back to submissions list</a>
+
+{% endblock %}

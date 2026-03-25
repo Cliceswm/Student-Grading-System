@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>{{ assessment.title }}</h1>
+
+<p><b>Subject:</b> {{ course.name }}</p>
+<p><b>Weight:</b> {{ assessment.weight }}%</p>
+<p><b>Description:</b> {{ assessment.description or "No description" }}</p>
+<p><b>Due date:</b> {{ assessment.due_date or "Not set" }}</p>
+
+<hr>
+
+{% if error %}
+<p class="msg-error">{{ error }}</p>
+{% endif %}
+
+{% if success %}
+<p class="msg-success">{{ success }}</p>
+{% endif %}
+
+<h2>Your Submission</h2>
+
+<form method="POST">
+    <label>Your comment:</label><br>
+    <textarea name="comment" rows="6" cols="60">{% if submission %}{{ submission.student_comment }}{% endif %}</textarea>
+    <br><br>
+
+    <button type="submit">Submit</button>
+</form>
+
+{% if submission %}
+<hr>
+<h3>Submission details</h3>
+<p><b>Submitted:</b> {{ submission.submitted }}</p>
+<p><b>Grade:</b> {{ submission.grade or "Not graded yet" }}</p>
+<p><b>Feedback:</b> {{ submission.feedback or "No feedback yet" }}</p>
+{% endif %}
+
+<br>
+<a href="/courses/{{ course.id }}/assessments">← Back to assessments</a>
+
+{% endblock %}

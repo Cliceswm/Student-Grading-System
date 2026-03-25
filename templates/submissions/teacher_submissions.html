@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>{{ assessment.title }}</h1>
+
+<p><b>Subject:</b> {{ course.name }}</p>
+<p><b>Weight:</b> {{ assessment.weight }}%</p>
+<p><b>Description:</b> {{ assessment.description or "No description" }}</p>
+<p><b>Due date:</b> {{ assessment.due_date or "Not set" }}</p>
+
+<a href="/courses/{{ course.id }}/assessments/{{ assessment.id }}/edit">Edit assessment</a>
+
+<br><br>
+<hr>
+
+<h2>Submissions</h2>
+
+<table style="width: 100%; border-collapse: collapse;" border="1" cellpadding="8">
+    <tr>
+        <th>Student</th>
+        <th>Submitted</th>
+        <th>Grade</th>
+    </tr>
+
+    {% for s in submissions %}
+    <tr class="clickable-row"
+        data-href="/courses/{{ course.id }}/assessments/{{ assessment.id }}/submissions/{{ s.student_id }}/grade"
+        onclick="window.location=this.dataset.href">
+
+        <td>{{ s.student_name }}</td>
+        <td>{{ s.submitted or "Not submitted" }}</td>
+        <td>{{ s.grade if s.grade is not none else "-" }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<br>
+<a href="/courses/{{ course.id }}/assessments">← Back to assessments</a>
+
+{% endblock %}

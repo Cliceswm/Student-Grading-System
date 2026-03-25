@@ -2,12 +2,18 @@ from db import get_db
 
 def get_students_for_course(course_id):
     db = get_db()
-    return db.execute("""
-        SELECT users.id, users.first_name, users.last_name, active
-        FROM enrollments
-        JOIN users ON enrollments.student_id = users.id
-        WHERE enrollments.course_id = ?
-    """, (course_id,)).fetchall()
+    cursor = db.cursor()
+
+    cursor.execute("""
+        SELECT u.id, u.first_name, u.last_name, u.email, u.role, u.active
+        FROM enrollments e
+        JOIN users u ON u.id = e.student_id
+        WHERE e.course_id = ?
+          AND u.role = 'student'
+          AND u.active = 1
+    """, (course_id,))
+
+    return [dict(row) for row in cursor.fetchall()]
 
 
 def enroll_student(course_id, student_id):
@@ -26,3 +32,17 @@ def unenroll_student(course_id, student_id):
         WHERE course_id = ? AND student_id = ?
     """, (course_id, student_id))
     db.commit()
+
+
+def is_student_enrolled(course_id, student_id):
+    db = get_db()
+    cursor = db.cursor()
+
+    cursor.execute("""
+        SELECT 1
+        FROM enrollments
+        WHERE course_id = ? AND student_id = ?
+        LIMIT 1
+    """, (course_id, student_id))
+
+    return cursor.fetchone() is not None

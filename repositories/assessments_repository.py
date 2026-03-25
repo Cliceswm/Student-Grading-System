@@ -79,3 +79,16 @@ def get_total_weight_for_course(course_id):
 
     row = cursor.fetchone()
     return row["total"] if row else 0
+
+
+def update_assessment_repo(assessment_id, title, description, weight, due_date):
+    db = get_db()
+    cursor = db.cursor()
+
+    cursor.execute("""
+        UPDATE assessments
+        SET title = ?, description = ?, weight = ?, due_date = ?
+        WHERE id = ?
+    """, (title, description, weight, due_date, assessment_id))
+
+    db.commit()
