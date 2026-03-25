@@ -80,3 +80,17 @@ def test_count_students_for_invalid_course(client):
         result = enrollments_service.count_active_students_for_course(-1)
 
     assert isinstance(result, tuple)
+
+
+
+def test_student_count_increases(client):
+
+    with client.application.app_context():
+
+        before = enrollments_service.count_active_students_for_course(1)
+
+        enrollments_service.enroll_student(1, 1)
+
+        after = enrollments_service.count_active_students_for_course(1)
+
+    assert after[0] >= before[0]
