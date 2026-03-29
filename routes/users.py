@@ -43,7 +43,7 @@ def add_user():
                 role=role
             )
 
-        return redirect(url_for("users.manage_users"))
+        return redirect("/users")
 
     return render_template("users/add_user.html")
 

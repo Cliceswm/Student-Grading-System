@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, session
+from flask import Blueprint, render_template, redirect, url_for, request, session
 from db import get_db
 from routes.auth import login_required
 from services.courses_service import get_course_by_id
@@ -50,6 +50,7 @@ def add_assessment(course_id):
         try:
             assessment, created = add_assessment_service(course_id, request.form)
             success = "Assessment created successfully"
+            return redirect(url_for("assessments.assessments", course_id=course_id))
         except ValueError as e:
             error = str(e)
 

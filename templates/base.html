@@ -35,6 +35,23 @@
 
     <hr>
 
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const token = "{{ csrf_token() }}";
+
+            document.querySelectorAll('form[method="POST"]').forEach(form => {
+                if (!form.querySelector('input[name="csrf_token"]')) {
+                    const input = document.createElement("input");
+                    input.type = "hidden";
+                    input.name = "csrf_token";
+                    input.value = token;
+                    form.appendChild(input);
+                }
+            });
+        });
+    </script>
+
+
     {% block content %}{% endblock %}
 
 </body>

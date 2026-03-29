@@ -3,6 +3,14 @@
 
 <h1>Grade {{ assessment.title }} in {{ course.name }}</h1>
 
+{% if error %}
+<p class="msg-error">{{ error }}</p>
+{% endif %}
+
+{% if success %}
+<p class="msg-success">{{ success }}</p>
+{% endif %}
+
 <p><b>Due date:</b> {{ assessment.due_date or "Not set" }}</p>
 
 <p><b>Submitted:</b> {{ submission.submitted or "Not submitted" }}</p>
@@ -24,10 +32,6 @@
 <hr>
 
 <h2>Grade</h2>
-
-{% if success %}
-<p class="msg-success">{{ success }}</p>
-{% endif %}
 
 <form method="POST">
     <label>Grade (0–100):</label><br>

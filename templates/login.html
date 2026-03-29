@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Login</title>
+    <title>Student Grading System</title>
 </head>
 
 <body>
@@ -15,6 +15,8 @@
 
 
     <form method="POST">
+        {{ csrf_token() }}
+        
         <label>Login:</label><br>
         <input type="text" name="identifier" placeholder="Enter your email or ID" required><br><br>
 
