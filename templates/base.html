@@ -7,52 +7,81 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <script defer src="{{ url_for('static', filename='js/dropdown.js') }}"></script>
     <script defer src="{{ url_for('static', filename='js/confirm_notification.js') }}"></script>
+
+    <style>
+        .topbar {
+            background: #eee;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .topbar .left,
+        .topbar .right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-logo {
+            height: 40px;
+            width: auto;
+            display: block;
+        }
+    </style>
 </head>
 
 <body>
 
-    <div style="background:#eee; padding:10px; display:flex; justify-content:space-between;">
+    <div class="page-container">
 
-        <div>
-            <a href="/courses">Courses</a>
+        <div class="topbar">
 
-            {% if current_user and current_user.role == "admin" %}
-            | <a href="/users">Users</a>
-            {% endif %}
+            <div class="left">
+                <a href="/courses"><img src="{{ url_for('static', filename='img/logo.png') }}" class="nav-logo" alt="Logo"></a>
+                <a href="/courses">Courses</a>
+
+                {% if current_user and current_user.role == "admin" %}
+                | <a href="/users">Users</a>
+                {% endif %}
+            </div>
+
+            <div class="right">
+                {% if current_user %}
+                <b>Hi {{ current_user.first_name }}!</b> |
+                <a href="/profile">Profile</a> |
+                <a href="/logout">Logout</a>
+                {% else %}
+                <a href="/login">Login</a>
+                {% endif %}
+            </div>
+
         </div>
 
-        <div>
-            {% if current_user %}
-            <b>Hi {{ current_user.first_name }}!</b> |
-            <a href="/profile">Profile</a> |
-            <a href="/logout">Logout</a>
-            {% else %}
-            <a href="/login">Login</a>
-            {% endif %}
-        </div>
+
+        <hr>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const token = "{{ csrf_token() }}";
+
+                document.querySelectorAll('form[method="POST"]').forEach(form => {
+                    if (!form.querySelector('input[name="csrf_token"]')) {
+                        const input = document.createElement("input");
+                        input.type = "hidden";
+                        input.name = "csrf_token";
+                        input.value = token;
+                        form.appendChild(input);
+                    }
+                });
+            });
+        </script>
+
+
+        {% block content %}{% endblock %}
 
     </div>
-
-    <hr>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const token = "{{ csrf_token() }}";
-
-            document.querySelectorAll('form[method="POST"]').forEach(form => {
-                if (!form.querySelector('input[name="csrf_token"]')) {
-                    const input = document.createElement("input");
-                    input.type = "hidden";
-                    input.name = "csrf_token";
-                    input.value = token;
-                    form.appendChild(input);
-                }
-            });
-        });
-    </script>
-
-
-    {% block content %}{% endblock %}
 
 </body>
 
