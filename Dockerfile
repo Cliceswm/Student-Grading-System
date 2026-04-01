@@ -1,5 +1,5 @@
 
-FROM python:3.15-rc-alpine3.22
+FROM python:3.10-slim
 
 # Set working directory
 WORKDIR /app
