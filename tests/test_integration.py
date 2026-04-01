@@ -29,7 +29,7 @@ def test_full_enrollment_flow(client):
     assert response.status_code in (200, 302)
 
 
-    # Course editing + teacher assignment
+# Course editing + teacher assignment
 def test_course_edit_and_teacher_assignment(client):
 
     # Login
