@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, session
 from db import get_db
-from routes.auth import login_required
+from routes.auth import role_required
 from services.profile_service import update_email, change_password
 
 profile_bp = Blueprint("profile", __name__)
@@ -8,7 +8,7 @@ profile_bp = Blueprint("profile", __name__)
 
 # Profile page
 @profile_bp.route("/profile", methods=["GET", "POST"])
-@login_required
+@role_required("admin", "teacher", "student")
 def profile():
     db = get_db()
     user_id = session["user_id"]
@@ -23,15 +23,12 @@ def profile():
     show_email_form = False
     show_password_form = False
 
-    # Show email form
     if request.method == "POST" and "show_email_form" in request.form:
         show_email_form = True
 
-    # Show password form
     if request.method == "POST" and "show_password_form" in request.form:
         show_password_form = True
 
-    # Updating email
     if request.method == "POST" and "update_email" in request.form:
         show_email_form = True
         new_email = request.form["email"].lower().strip()
@@ -40,13 +37,11 @@ def profile():
 
         if success:
             show_email_form = False
-            # Updating user data
             user = db.execute(
                 "SELECT * FROM users WHERE id = ?",
                 (user_id,)
             ).fetchone()
 
-    # Change password
     if request.method == "POST" and "change_password" in request.form:
         show_password_form = True
 

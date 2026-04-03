@@ -20,17 +20,24 @@
 /* Clickable rows */
 .clickable-row {
     cursor: pointer;
+    background-color: #f0f0f0;
 }
 
 .clickable-row:hover {
-    background-color: #f0f0f0;
+    background-color: #aab7c6;
 }
 
 
 /* Dropdown list */
 .dropdown-container {
     position: relative;
-    width: 250px;
+    min-width: 300px;
+    width: fit-content;
+}
+
+.dropdown-input {
+    min-width: 100%;
+    box-sizing: border-box;
 }
 
 .dropdown-list {
@@ -84,6 +91,11 @@ body {
 .page-container {
     max-width: 1100px;
     margin: 0 auto;
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
 }
 
 h1,
@@ -163,6 +175,7 @@ a:hover {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    border-radius: 8px;
 }
 
 .topbar .left,

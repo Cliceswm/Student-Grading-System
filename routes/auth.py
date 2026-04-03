@@ -1,40 +1,24 @@
-from flask import Blueprint, render_template, request, redirect, url_for, session
+from flask import Blueprint, render_template, request, redirect, url_for, session, abort
 from functools import wraps
 from db import get_db
 from services.auth_service import authenticate_user
 
 auth_bp = Blueprint("auth", __name__)
 
-# Decorator @login_required
-def login_required(f):
-    @wraps(f)
-    def wrapper(*args, **kwargs):
-        if "user_id" not in session:
-            return redirect(url_for("auth.login"))
+# Decorator @role_required
+def role_required(*roles):
+    def decorator(f):
+        @wraps(f)
+        def wrapper(*args, **kwargs):
+            if "user_id" not in session:
+                return redirect(url_for("auth.login"))
 
-        db = get_db()
-        user = db.execute(
-            "SELECT * FROM users WHERE id = ?", 
-            (session["user_id"],)
-        ).fetchone()
+            if "role" not in session or session["role"] not in roles:
+                return redirect(url_for("auth.login")) # Change later
 
-        if not user or user["active"] == 0:
-            session.clear()
-            return redirect(url_for("auth.login"))
-
-        return f(*args, **kwargs)
-    return wrapper
-
-
-
-# Decorator @admin_required
-def admin_required(f):
-    @wraps(f)
-    def wrapper(*args, **kwargs):
-        if "role" not in session or session["role"] != "admin":
-            return redirect(url_for("auth.login"))
-        return f(*args, **kwargs)
-    return wrapper
+            return f(*args, **kwargs)
+        return wrapper
+    return decorator
 
 
 
