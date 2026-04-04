@@ -1,6 +1,5 @@
 from flask import Blueprint, render_template, request, session
-from db import get_db
-from routes.auth import login_required
+from routes.auth import role_required
 from services.submissions_service import (
     student_submission_service, 
     get_teacher_submissions_service,
@@ -9,15 +8,12 @@ from services.submissions_service import (
 
 submissions_bp = Blueprint("submissions", __name__)
 
+
 # Student's submission page
 @submissions_bp.route("/courses/<int:course_id>/assessments/<int:assessment_id>/submission", methods=["GET", "POST"])
-@login_required
+@role_required("student")
 def student_submission(course_id, assessment_id):
-    role = session["role"]
     student_id = session["user_id"]
-
-    if role != "student":
-        return "Access denied", 403
 
     try:
         if request.method == "POST":
@@ -45,12 +41,8 @@ def student_submission(course_id, assessment_id):
 
 # Teacher's page with list of students' submissions
 @submissions_bp.route("/courses/<int:course_id>/assessments/<int:assessment_id>/submissions")
-@login_required
+@role_required("teacher")
 def teacher_submissions(course_id, assessment_id):
-    role = session["role"]
-    if role != "teacher":
-        return "Access denied", 403
-
     try:
         course, assessment, submissions = get_teacher_submissions_service(course_id, assessment_id)
     except ValueError as e:
@@ -66,11 +58,8 @@ def teacher_submissions(course_id, assessment_id):
 
 # Grading page
 @submissions_bp.route("/courses/<int:course_id>/assessments/<int:assessment_id>/submissions/<int:student_id>/grade", methods=["GET", "POST"])
-@login_required
+@role_required("teacher")
 def grade_submission(course_id, assessment_id, student_id):
-    if session["role"] != "teacher":
-        return "Access denied", 403
-
     try:
         if request.method == "POST":
             course, assessment, submission = grade_submission_service(

@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session
-from routes.auth import login_required, admin_required
+from routes.auth import role_required
 from services.courses_service import get_courses_for_user, add_course
 from services.enrollments_service import count_active_students_for_course
 
@@ -8,14 +8,14 @@ courses_bp = Blueprint("courses", __name__)
 
 # Main route. Leads to courses/ if logged in, otherwise to login/
 @courses_bp.route("/")
-@login_required
+@role_required("admin", "teacher", "student")
 def index():
     return redirect(url_for("courses.courses"))
 
 
 # Courses page
 @courses_bp.route("/courses")
-@login_required
+@role_required("admin", "teacher", "student")
 def courses():
     role = session["role"]
     user_id = session["user_id"]
@@ -27,10 +27,8 @@ def courses():
 
 # Add a course page
 @courses_bp.route("/courses/add_course", methods=["GET", "POST"])
-@login_required
-@admin_required
+@role_required("admin")
 def add_course_route():
-
     if request.method == "POST":
         name = request.form["name"]
 
@@ -50,8 +48,7 @@ def add_course_route():
 
 # Edit course page
 @courses_bp.route("/courses/<int:course_id>/edit", methods=["GET", "POST"])
-@login_required
-@admin_required
+@role_required("admin")
 def edit_course(course_id):
     from services.courses_service import (
         load_course_for_edit,

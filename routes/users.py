@@ -1,5 +1,5 @@
-from flask import Blueprint, render_template, request, redirect, url_for
-from routes.auth import login_required, admin_required
+from flask import Blueprint, render_template, request, redirect
+from routes.auth import role_required
 from services.users_service import (
     get_all_users,
     create_user,
@@ -12,8 +12,7 @@ users_bp = Blueprint("users", __name__)
 
 # Users page (admin only)
 @users_bp.route("/users")
-@login_required
-@admin_required
+@role_required("admin")
 def manage_users():
     users = get_all_users()
     return render_template("users.html", users=users)
@@ -21,8 +20,7 @@ def manage_users():
 
 # Add a user page (admin only)
 @users_bp.route("/users/add_user", methods=["GET", "POST"])
-@login_required
-@admin_required
+@role_required("admin")
 def add_user():
     if request.method == "POST":
         first_name = request.form["first_name"].strip()
@@ -50,8 +48,7 @@ def add_user():
 
 # Edit user page (admin only)
 @users_bp.route("/users/<int:user_id>/edit", methods=["GET", "POST"])
-@login_required
-@admin_required
+@role_required("admin")
 def edit_user(user_id):
     user = get_user_by_id(user_id)
 
